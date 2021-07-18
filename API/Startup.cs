@@ -37,6 +37,7 @@ namespace API
 		
 
 		// This method gets called by the runtime. Use this method to add services to the container.
+		// Ordering does not matter
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// make use of created class (DataContext) with the provided connection string
@@ -52,9 +53,13 @@ namespace API
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
 			});
+
+			// CORS (Cross Origin Requests) support
+			services.AddCors();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		// Ordering matters
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			// check if we're in development mode
@@ -69,6 +74,10 @@ namespace API
 			app.UseHttpsRedirection();
 
 			app.UseRouting();
+
+			// CORS (Cross Origin Requests) support
+			app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod()
+				.WithOrigins("https://localhost:4200"));
 
 			app.UseAuthorization();
 
