@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using API.Data;
+using API.Extensions;
+using API.Interfaces;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace API
@@ -34,19 +40,16 @@ namespace API
 		{
 			_config = config;
 		}
-		
+
 
 		// This method gets called by the runtime. Use this method to add services to the container.
-		// Ordering does not matter
+		// Dependency Injection Container
+		// Order does not matter
 		public void ConfigureServices(IServiceCollection services)
 		{
-			// make use of created class (DataContext) with the provided connection string
-			services.AddDbContext<DataContext>(options => // lambda expression
-			{
-				// pass connection string to our db (Sqlite)
-				// we get connection string from appsettings.Development
-				options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
-			});
+			// Extension method
+			// code inside this method was HERE
+			services.AddApplicationServices(_config);
 
 			services.AddControllers();
 			services.AddSwaggerGen(c =>
@@ -56,6 +59,10 @@ namespace API
 
 			// CORS (Cross Origin Requests) support
 			services.AddCors();
+
+			// Extension method
+			// code inside this method was HERE
+			services.AddIdentityServices(_config);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,6 +86,8 @@ namespace API
 			app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod()
 				.WithOrigins("https://localhost:4200"));
 
+			// authenticate that the user has a jwt when there's an Authenticate above the route
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

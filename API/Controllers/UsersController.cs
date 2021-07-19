@@ -3,21 +3,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")] // api/Users
-	public class UsersController : ControllerBase
+	// [ApiController]
+	// [Route("api/[controller]")] // api/Users
+	// Because of the inheritance, we no longer need the attributes, methods and properties which are in BaseApiController
+	public class UsersController : BaseApiController
 	{
 		private readonly DataContext _context;
 		public UsersController(DataContext context)
 		{
 			_context = context;
 		}
-		
+
 
 		/// <summary>
 		/// Get all users as a IEnumerable Asynchronous
@@ -27,6 +29,7 @@ namespace API.Controllers
 		/// </summary>
 		/// <returns> a list of users </returns>
 		///
+		[AllowAnonymous]
 		[HttpGet] // api/users
 		public async Task <ActionResult<IEnumerable<AppUser>>> GetUsers()
 		{
@@ -39,6 +42,7 @@ namespace API.Controllers
 		/// <param name="id"></param>
 		/// <returns> a user with specified id </returns>
 		///
+		[Authorize] 
 		[HttpGet("{id}")] // api/users/2
 		public async Task<ActionResult<AppUser>> GetUser(int id)
 		{
