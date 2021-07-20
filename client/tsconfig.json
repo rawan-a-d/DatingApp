@@ -1,11 +1,66 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
+// {
+//   "compileOnSave": false,
+//   "compilerOptions": {
+//     "baseUrl": "./",
+//     "outDir": "./dist/out-tsc",
+//     "forceConsistentCasingInFileNames": true,
+//     "strict": true,
+//     "noImplicitReturns": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "sourceMap": true,
+//     "declaration": false,
+//     "downlevelIteration": true,
+//     "experimentalDecorators": true,
+//     "moduleResolution": "node",
+//     "importHelpers": true,
+//     // what our ts will be compiled to (js version es2017)
+//     "target": "es2017",
+//     "module": "es2020",
+//     "lib": [
+//       "es2018",
+//       "dom"
+//     ]
+//   },
+//   "angularCompilerOptions": {
+//     "enableI18nLegacyMessageIdFormat": false,
+//     "strictInjectionParameters": true,
+//     "strictInputAccessModifiers": true,
+//     "strictTemplates": true
+//   }
+// }
+
+
+
+// to disable strict mode (initializing all variables)
+// {
+//   "compileOnSave": false,
+//   "compilerOptions": {
+//     "baseUrl": "./",
+//     "outDir": "./dist/out-tsc",
+//     "sourceMap": true,
+//     "declaration": false,
+//     "downlevelIteration": true,
+//     "experimentalDecorators": true,
+//     "moduleResolution": "node",
+//     "importHelpers": true,
+//     "target": "es2015",
+//     "module": "es2020",
+//     "lib": [
+//       "es2019",
+//       "es2018",
+//       "dom"
+//     ]
+//   }
+// }
+
 {
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "strict": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
@@ -14,8 +69,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    // what our ts will be compiled to (js version es2017)
-    "target": "es2017",
+    "target": "es2015",
     "module": "es2020",
     "lib": [
       "es2018",
@@ -23,9 +77,8 @@
     ]
   },
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictInjectionParameters": false,
+    "strictInputAccessModifiers": false,
+    "strictTemplates": false
   }
 }

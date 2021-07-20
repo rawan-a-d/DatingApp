@@ -1,8 +1,11 @@
-<h1>{{title}}</h1>
-
-<ul>
-	<!-- ngFor: Structural directive, doesn't get added to the DOM unless it's executed -->
-	<li *ngFor="let user of users">
-		{{user.id}} - {{user.userName}}
-	</li>
-</ul>
+<app-nav></app-nav>
+<div class="container" id="users-container">
+	<!-- <ul> -->
+		<!-- ngFor: Structural directive, doesn't get added to the DOM unless it's executed -->
+		<!-- <li *ngFor="let user of users">
+			{{user.id}} - {{user.userName}}
+		</li>
+	</ul> -->
+	
+	<app-home></app-home>
+</div>
