@@ -11,7 +11,6 @@ import { AccountService } from './_services/account.service';
 })
 export class AppComponent implements OnInit {
   title = 'The Dating app';
-  users: any;
   
   // Dependency injection http client to send HTTP requests
   constructor(private http: HttpClient,
@@ -20,9 +19,7 @@ export class AppComponent implements OnInit {
   
   
   // Lifecycle hook: called after Angular has initialized all data-bound property of a directive
-  ngOnInit() {
-    // this.getUsers();
-    
+  ngOnInit() {    
     // Set current user in account service when app starts
     this.setCurrentUser();
   }
@@ -36,16 +33,4 @@ export class AppComponent implements OnInit {
     // set current user in account service
     this.accountService.setCurrentUser(user);
   }
-  
-  
-  // getUsers() {
-  //   this.http.get('https://localhost:5001/api/users')
-  //     .subscribe(response => {
-  //       this.users = response;
-  //     }, error => {
-  //       console.log(error);
-  //     })
-  // }
-  
-  
 }

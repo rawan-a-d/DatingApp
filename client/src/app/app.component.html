@@ -1,11 +1,4 @@
 <app-nav></app-nav>
-<div class="container" id="users-container">
-	<!-- <ul> -->
-		<!-- ngFor: Structural directive, doesn't get added to the DOM unless it's executed -->
-		<!-- <li *ngFor="let user of users">
-			{{user.id}} - {{user.userName}}
-		</li>
-	</ul> -->
-	
-	<app-home></app-home>
+<div class="container" id="users-container">	
+	<router-outlet></router-outlet>
 </div>

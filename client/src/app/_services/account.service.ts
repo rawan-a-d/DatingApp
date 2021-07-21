@@ -17,7 +17,7 @@ export class AccountService {
   // anytime a subscriber subscribe to this observable, it emits the last value inside it, or however many values inside it we want to emit.
   // this object stores only one user (current user)
   private currentUserSource = new ReplaySubject<User>(1);
-  // create an observable
+  // create an observable to be observed by other components, classes
   currentUser$ = this.currentUserSource.asObservable();
   
   constructor(private http: HttpClient) { }
