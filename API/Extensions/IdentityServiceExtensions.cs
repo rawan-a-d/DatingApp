@@ -6,8 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions
 {
-    public static class IdentityServiceExtensions
-    {
+	public static class IdentityServiceExtensions
+	{
 		// Extension method
 		// 1. save us from writing repetitive code, we can put it inside of an extension method and reuse it
 		// 2. keep startup class as clean as possible
@@ -28,5 +28,5 @@ namespace API.Extensions
 
 			return services;
 		}
-    }
+	}
 }

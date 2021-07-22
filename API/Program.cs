@@ -9,20 +9,20 @@ using Microsoft.Extensions.Logging;
 
 namespace API
 {
-    public class Program
-    {
-        // First method to run
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+	public class Program
+	{
+		// First method to run
+		public static void Main(string[] args)
+		{
+			CreateHostBuilder(args).Build().Run();
+		}
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    // Use Startup class
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+		public static IHostBuilder CreateHostBuilder(string[] args) =>
+			Host.CreateDefaultBuilder(args)
+				.ConfigureWebHostDefaults(webBuilder =>
+				{
+					// Use Startup class
+					webBuilder.UseStartup<Startup>();
+				});
+	}
 }

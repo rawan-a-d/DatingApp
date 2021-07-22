@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace API.Extensions
 {
-    public static class ApplicationServiceExtensions
-    {
+	public static class ApplicationServiceExtensions
+	{
 		// Extension method
 		// 1. save us from writing repetitive code, we can put it inside of an extension method and reuse it
 		// 2. keep startup class as clean as possible
@@ -36,5 +36,5 @@ namespace API.Extensions
 
 			return services;
 		}
-    }
+	}
 }

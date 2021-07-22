@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.Extensions;
 using API.Interfaces;
+using API.Middleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -70,12 +71,16 @@ namespace API
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			// check if we're in development mode
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-				app.UseSwagger();
-				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
-			}
+			// Middleware to catch exceptions if there's no error handling in any of the bottom classes/methods
+			// if (env.IsDevelopment())
+			// {
+			// 	app.UseDeveloperExceptionPage();
+			// 	app.UseSwagger();
+			// 	app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+			// }
+
+			// Middleware to catch exceptions
+			app.UseMiddleware<ExceptionMiddleware>();
 
 			// redirect from HTTP address to the HTTP end-point
 			app.UseHttpsRedirection();
