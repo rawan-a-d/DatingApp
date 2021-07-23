@@ -1,6 +1,7 @@
 using System.Linq;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using AutoMapper;
 
 namespace API.Helpers
@@ -18,7 +19,12 @@ namespace API.Helpers
 				.ForMember(dest => dest.PhotoUrl, opt => opt.MapFrom(src =>
 					src.Photos.FirstOrDefault(x =>
 						x.IsMain).Url
-					));
+					))
+				// Make query more efficient by getting the age here
+				.ForMember(dest => dest.Age, opt => 
+					opt.MapFrom(src => 
+						src.DateOfBirth.CalculateAge())
+					);
 			CreateMap<Photo, PhotoDto>();
 		}
 	}

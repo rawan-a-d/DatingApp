@@ -23,9 +23,10 @@ namespace API.Entities
 		public string Country { get; set; }
 		public ICollection<Photo> Photos { get; set; }
 
-		public int GetAge() {
-			return DateOfBirth.CalculateAge();
-		}
+		// Using this in AutoMapperProfiles makes the select query more efficient
+		//public int GetAge() {
+		//	return DateOfBirth.CalculateAge();
+		//}
 
 		// generate by propfull -> tab
 		// public int MyProperty
