@@ -7,6 +7,7 @@
 	<ItemGroup>
 	<!-- Entity Framework: translate code into SQL commands -->
 	<!-- Sqlite db: good db for development, doesn;t require any installments -->
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

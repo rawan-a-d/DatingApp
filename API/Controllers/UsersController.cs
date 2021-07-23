@@ -2,7 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.DTOs;
 using API.Entities;
+using API.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +15,15 @@ namespace API.Controllers
 	// [ApiController]
 	// [Route("api/[controller]")] // api/Users
 	// Because of the inheritance, we no longer need the attributes, methods and properties which are in BaseApiController
+	[Authorize]
 	public class UsersController : BaseApiController
 	{
-		private readonly DataContext _context;
-		public UsersController(DataContext context)
+		private readonly IUserRepository _userRepository;
+		private readonly IMapper _mapper;
+		public UsersController(IUserRepository userRepository, IMapper mapper)
 		{
-			_context = context;
+			_mapper = mapper;
+			_userRepository = userRepository;
 		}
 
 
@@ -29,11 +35,17 @@ namespace API.Controllers
 		/// </summary>
 		/// <returns> a list of users </returns>
 		///
-		[AllowAnonymous]
+		//[AllowAnonymous]
 		[HttpGet] // api/users
-		public async Task <ActionResult<IEnumerable<AppUser>>> GetUsers()
+		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
 		{
-			return await _context.Users.ToListAsync();
+			//return await _context.Users.ToListAsync();
+			var users = await _userRepository.GetUsersAsync();
+
+			// map list of users to a list of MemberDto
+			var usersToReturn = _mapper.Map<IEnumerable<MemberDto>>(users);
+
+			return Ok(usersToReturn);
 		}
 
 		/// <summary>
@@ -42,11 +54,13 @@ namespace API.Controllers
 		/// <param name="id"></param>
 		/// <returns> a user with specified id </returns>
 		///
-		[Authorize] 
-		[HttpGet("{id}")] // api/users/2
-		public async Task<ActionResult<AppUser>> GetUser(int id)
+		//[Authorize] 
+		[HttpGet("{username}")] // api/users/lisa
+		public async Task<ActionResult<MemberDto>> GetUser(string username)
 		{
-			return await _context.Users.FindAsync(id);
+			var user = await _userRepository.GetUserByUsernameAsync(username);
+
+			return _mapper.Map<MemberDto>(user);
 		}
 
 
@@ -65,7 +79,7 @@ namespace API.Controllers
 
 			return users;
 		} */
-		
+
 
 		/// <summary>
 		/// Get a user with specified id

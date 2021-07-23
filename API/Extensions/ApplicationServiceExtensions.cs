@@ -1,4 +1,5 @@
 using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,12 @@ namespace API.Extensions
 			// 2. AddScoped: scoped to the lifetime of the http request
 			// 3. AddTransient: destroyed as soon as the method is finished
 			services.AddScoped<ITokenService, TokenService>();
+
+			// User Repository
+			services.AddScoped<IUserRepository, UserRepository>();
+
+			// AutoMapper
+			services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 			// make use of created class (DataContext) with the provided connection string
 			services.AddDbContext<DataContext>(options => // lambda expression
