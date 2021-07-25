@@ -457,3 +457,5 @@ $RECYCLE.BIN/
 ## App settings (added)
 appsettings.json
 client/.editorconfig
+.vscode/settings.json
+client/src/environments/environment.prod.ts
