@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -21,9 +21,13 @@ import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { MemberCardComponent } from './members/member-card/member-card.component';
 import { JwtInterceptor } from './_interceptors/jwt.interceptor';
+import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { LoadingInterceptor } from './_interceptors/loading.interceptor';
 
 // Decorator for Angular Module
 @NgModule({
+	// Fix not known element error
+	schemas: [CUSTOM_ELEMENTS_SCHEMA],
 	// Components
 	declarations: [
 		AppComponent,
@@ -38,6 +42,7 @@ import { JwtInterceptor } from './_interceptors/jwt.interceptor';
 		NotFoundComponent,
 		ServerErrorComponent,
 		MemberCardComponent,
+		MemberEditComponent,
 	],
 	// Angular Modules
 	imports: [
@@ -61,6 +66,12 @@ import { JwtInterceptor } from './_interceptors/jwt.interceptor';
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: JwtInterceptor,
+			multi: true,
+		},
+		// show a loading spinner when a request is sent
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: LoadingInterceptor,
 			multi: true,
 		},
 	],

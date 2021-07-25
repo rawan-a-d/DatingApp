@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ToastrModule } from 'ngx-toastr';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 // Tidying up the app module by using a shared module for non angular modules
 @NgModule({
@@ -23,8 +24,18 @@ import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 		// Photo gallery
 		// https://www.npmjs.com/package/@kolkov/ngx-gallery
 		NgxGalleryModule,
+		// Loading spinner
+		// https://www.npmjs.com/package/ngx-spinner
+		// if error: npm i @angular/cdk
+		NgxSpinnerModule,
 	],
 	// Need to export the modules in order to work in app.module
-	exports: [BsDropdownModule, ToastrModule, TabsModule, NgxGalleryModule],
+	exports: [
+		BsDropdownModule,
+		ToastrModule,
+		TabsModule,
+		NgxGalleryModule,
+		NgxSpinnerModule,
+	],
 })
 export class SharedModule {}
