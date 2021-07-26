@@ -5,6 +5,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { FileUploadModule } from 'ng2-file-upload';
 
 // Tidying up the app module by using a shared module for non angular modules
 @NgModule({
@@ -26,8 +27,11 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 		NgxGalleryModule,
 		// Loading spinner
 		// https://www.npmjs.com/package/ngx-spinner
+		// https://labs.danielcardoso.net/load-awesome/animations.html
 		// if error: npm i @angular/cdk
 		NgxSpinnerModule,
+		// https://valor-software.com/ng2-file-upload/
+		FileUploadModule,
 	],
 	// Need to export the modules in order to work in app.module
 	exports: [
@@ -36,6 +40,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 		TabsModule,
 		NgxGalleryModule,
 		NgxSpinnerModule,
+		FileUploadModule,
 	],
 })
 export class SharedModule {}

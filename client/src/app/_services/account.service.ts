@@ -32,18 +32,18 @@ export class AccountService {
 				// const user = <User>response;
 				const user = response;
 				if (user) {
-					// save user in local storage
-					localStorage.setItem('user', JSON.stringify(user));
-
-					// set the currentUserSource
-					this.currentUserSource.next(user);
+					// set the currentUserSource and save the user into local storage
+					this.setCurrentUser(user);
 				}
 			})
 		);
 	}
 
-	// set the currentUserSource
+	// set the currentUserSource and save the user into local storage
 	setCurrentUser(user: User) {
+		// save user in local storage
+		localStorage.setItem('user', JSON.stringify(user));
+
 		this.currentUserSource.next(user);
 	}
 
@@ -62,11 +62,8 @@ export class AccountService {
 			// apply a given function to each value
 			map((user: User) => {
 				if (user) {
-					// save user in local storage
-					localStorage.setItem('user', JSON.stringify(user));
-
-					// set the currentUserSource
-					this.currentUserSource.next(user);
+					// set the currentUserSource and save the user into local storage
+					this.setCurrentUser(user);
 				}
 			})
 		);

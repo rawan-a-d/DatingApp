@@ -20,6 +20,12 @@ namespace API.Extensions
 		/// <param name="config">configuration</param>
 		/// <returns>the services</returns>
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config) {
+			// CloudinarySettings
+			// populate fields in CloudinarySettings class with data in appsettings.json
+			services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+			// PhotoService
+			services.AddScoped<IPhotoService, PhotoService>();
+
 			// Token service
 			// 3 ways to do this
 			// 1. AddSingleton: doesn't stop until our application stops

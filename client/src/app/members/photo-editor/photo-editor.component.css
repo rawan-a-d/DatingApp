@@ -1,0 +1,18 @@
+/* Images */
+img.img-thumbnail {
+	height: 100px;
+	min-width: 100px !important;
+	margin-bottom: 2px;
+}
+
+
+/* Drop images zonde on hover */
+.nv-file-over {
+	border: dotted 3px red;
+}
+
+
+/* Upload image input */
+input[type=file] {
+	color: transparent;
+}
