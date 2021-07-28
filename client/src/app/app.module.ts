@@ -2,7 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,6 +24,8 @@ import { JwtInterceptor } from './_interceptors/jwt.interceptor';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { LoadingInterceptor } from './_interceptors/loading.interceptor';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
+import { TextInputComponent } from './_forms/text-input/text-input.component';
+import { DateInputComponent } from './_forms/date-input/date-input.component';
 
 // Decorator for Angular Module
 @NgModule({
@@ -44,7 +46,9 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
 		ServerErrorComponent,
 		MemberCardComponent,
 		MemberEditComponent,
-  PhotoEditorComponent,
+		PhotoEditorComponent,
+  TextInputComponent,
+  DateInputComponent,
 	],
 	// Angular Modules
 	imports: [
@@ -55,6 +59,7 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
 		TooltipModule.forRoot(),
 		BrowserAnimationsModule,
 		FormsModule,
+		ReactiveFormsModule,
 		// non Angular modules
 		SharedModule,
 	],

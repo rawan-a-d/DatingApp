@@ -6,6 +6,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { FileUploadModule } from 'ng2-file-upload';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 // Tidying up the app module by using a shared module for non angular modules
 @NgModule({
@@ -32,6 +33,9 @@ import { FileUploadModule } from 'ng2-file-upload';
 		NgxSpinnerModule,
 		// https://valor-software.com/ng2-file-upload/
 		FileUploadModule,
+		// Bootstrap date picker (HTML date picker is different on each browser)
+		// https://valor-software.com/ngx-bootstrap/#/datepicker
+		BsDatepickerModule.forRoot(),
 	],
 	// Need to export the modules in order to work in app.module
 	exports: [
@@ -41,6 +45,7 @@ import { FileUploadModule } from 'ng2-file-upload';
 		NgxGalleryModule,
 		NgxSpinnerModule,
 		FileUploadModule,
+		BsDatepickerModule,
 	],
 })
 export class SharedModule {}
