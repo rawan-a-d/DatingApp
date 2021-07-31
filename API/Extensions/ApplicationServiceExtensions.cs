@@ -26,6 +26,9 @@ namespace API.Extensions
 			// PhotoService
 			services.AddScoped<IPhotoService, PhotoService>();
 
+			// LogUserActivity
+			services.AddScoped<LogUserActivity>();
+
 			// Token service
 			// 3 ways to do this
 			// 1. AddSingleton: doesn't stop until our application stops

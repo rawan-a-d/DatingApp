@@ -12,5 +12,8 @@ namespace API.DTOs
 		public string PhotoUrl { get; set; }
 
 		public string KnownAs { get; set; }
+
+		// easier to use, when getting all members
+		public string Gender { get; set; }
 	}
 }

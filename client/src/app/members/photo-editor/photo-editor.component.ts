@@ -109,7 +109,7 @@ export class PhotoEditorComponent implements OnInit {
 				this.member.photos.push(photo);
 
 				// update user object with the new photo
-				//if (this.user.photoUrl == null) {
+				//if (this.user.photoUrl == null) {er
 				if (photo.isMain) {
 					this.user.photoUrl = photo.url;
 					this.member.photoUrl = photo.url;
