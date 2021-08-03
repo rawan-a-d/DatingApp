@@ -39,6 +39,9 @@ namespace API.Extensions
 			// User Repository
 			services.AddScoped<IUserRepository, UserRepository>();
 
+			// Likes Repository
+			services.AddScoped<ILikesRepository, LikesRepository>();
+
 			// AutoMapper
 			services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 

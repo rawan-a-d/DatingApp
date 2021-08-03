@@ -46,6 +46,16 @@ export class ErrorInterceptor implements HttpInterceptor {
 								//this.toastr.error(error.statusText, error.status);
 								this.toastr.error(error.error, error.status);
 							}
+							// check if error.error is an object
+							//else if (typeof error.error === 'object') {
+							//	this.toastr.error(
+							//		error.statusText,
+							//		error.status
+							//	);
+							//}
+							//else {
+							//	this.toastr.error(error.error, error.status);
+							//}
 							break;
 						case 401:
 							// this.toastr.error(error.statusText, error.status);

@@ -2,32 +2,8 @@ namespace API.Helpers
 {
 	// User query params received with the http request
 	// pagination, selection of gender and excluding of current user
-	public class UserParams
+	public class UserParams: PaginationParams
 	{
-		// maximum allowed page size
-		private const int MaxPageSize = 50;
-
-		public int PageNumber { get; set; } = 1;
-
-		// default page size
-		private int _pageSize = 10; 
-
-		public int PageSize { 
-			get { 
-				return _pageSize; 
-			} 
-			set {
-				if(value > MaxPageSize) {
-					_pageSize = 50;
-				}
-				else {
-					_pageSize = value;
-				}
-			} 
-			//get =>  _pageSize;
-			//set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
-		}
-
 		// used to exclude current user from list
 		public string CurrentUsename { get; set; }
 

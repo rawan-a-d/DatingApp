@@ -23,6 +23,11 @@ namespace API.Entities
 		public string Country { get; set; }
 		public ICollection<Photo> Photos { get; set; }
 
+		// Users who liked this user
+		public ICollection<UserLike> LikedByUsers { get; set; }
+		// Users this user liked 
+		public ICollection<UserLike> LikedUsers { get; set; }
+
 		// Using this in AutoMapperProfiles makes the select query more efficient
 		//public int GetAge() {
 		//	return DateOfBirth.CalculateAge();
