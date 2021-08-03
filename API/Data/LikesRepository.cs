@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +40,7 @@ namespace API.Data
 		/// <param name="predicate">condition</param>
 		/// <param name="userId">user id</param>
 		/// <returns>a list of LikeDto</returns>
-		public async Task<IEnumerable<LikeDto>> GetUserLikes(string predicate, int userId)
+		public async Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams)
 		{
 			// users query ordered by username
 			var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
@@ -48,14 +49,14 @@ namespace API.Data
 			var likes = _context.Likes.AsQueryable();
 
 			// users the current user has liked
-			if(predicate == "liked") {
-				likes = likes.Where(like => like.SourceUserId == userId);
+			if(likesParams.Predicate == "liked") {
+				likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
 				// users from liked table
 				users = likes.Select(like => like.LikedUser);
 			}
 			// users who liked the current user
-			else if(predicate == "likedBy") {
-				likes = likes.Where(like => like.LikedUserId == userId);
+			else if(likesParams.Predicate == "likedBy") {
+				likes = likes.Where(like => like.LikedUserId == likesParams.UserId);
 				// users from liked table
 				users = likes.Select(like => like.SourceUser);            
 			}
@@ -65,14 +66,17 @@ namespace API.Data
 			}
 
 			// project manually instead of using Mapper
-			return await users.Select(user => new LikeDto {
+			var query = users.Select(user => new LikeDto
+			{
 				Username = user.UserName,
 				KnownAs = user.KnownAs,
 				Age = user.DateOfBirth.CalculateAge(),
 				PhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url,
 				City = user.City,
 				Id = user.Id
-			}).ToListAsync();
+			});
+
+			return await PagedList<LikeDto>.CreateAsync(query, likesParams.PageNumber, likesParams.PageSize);
 		}
 
 		/// <summary>
