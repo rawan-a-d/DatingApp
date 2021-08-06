@@ -1,7 +1,8 @@
-<div class="row" *ngIf="member">
-	<div class="col-4">
+<div class="row justify-content-center">
+	<div class="col-lg-3 col-sm-5">
 		<div class="card">
-			<img [src]="member.photoUrl || './assets/user.png'" alt="member.knownAs" class="card-img-top img-thumbnail">
+			<img [src]="member.photoUrl || './assets/user.png'" [alt]="member.knownAs"
+				class="card-img-top img-thumbnail">
 			<div class="card-body">
 				<div>
 					<strong>Location:</strong>
@@ -26,18 +27,18 @@
 			<div class="card-footer">
 				<div class="btn-group d-flex">
 					<button class="btn btn-primary">Like</button>
-					<button class="btn btn-success">Message</button>
+					<button class="btn btn-success" (click)="selectTab(3)">Message</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<!-- Tabs -->
-	<div class="col-8">
+	<div class="col-lg-6 col-sm-7">
 		<!-- Tab component encapsulates their own style -->
 		<!-- so in order to style we need to add a class and style it in a global file -->
-		<tabset class="member-tabset">
-			<tab heading='About {{ member.knownAs }}'>
+		<tabset class="member-tabset" #memberTabs>
+			<tab heading='About {{ member.knownAs }}' (selectTab)="onTabActivated($event)">
 				<h4>Description</h4>
 				<p>{{ member.introduction }}</p>
 
@@ -45,17 +46,18 @@
 				<p>{{ member.lookingFor }}</p>
 			</tab>
 
-			<tab heading='Interests'>
+			<tab heading='Interests' (selectTab)="onTabActivated($event)">
 				<h4>Interests</h4>
 				<p>{{ member.interests }}</p>
 			</tab>
 
-			<tab heading='Photos'>
+			<tab heading='Photos' (selectTab)="onTabActivated($event)">
 				<ngx-gallery [options]="galleryOptions" [images]="galleryImages" class="ngx-gallery"></ngx-gallery>
 			</tab>
 
-			<tab heading='Messages'>
-				<p>Messages here</p>
+			<tab heading='Messages' (selectTab)="onTabActivated($event)">
+				<!--<app-member-messages [username]="member.username"></app-member-messages>-->
+				<app-member-messages [messages]="messages" [username]="member.username"></app-member-messages>
 			</tab>
 		</tabset>
 	</div>

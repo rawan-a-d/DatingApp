@@ -1,0 +1,24 @@
+/* Table */
+table {
+	cursor: pointer;
+}
+
+/*.table > .btn-warning {
+	background-color: none;
+}*/
+
+
+/* Headers */
+#message-table-header {
+	width: 40%;
+}
+
+.table-header {
+	width: 40%;
+}
+
+
+/* Image */
+.img-circle {
+	max-height: 50px;
+}

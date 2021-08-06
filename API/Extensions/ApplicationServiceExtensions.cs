@@ -42,6 +42,9 @@ namespace API.Extensions
 			// Likes Repository
 			services.AddScoped<ILikesRepository, LikesRepository>();
 
+			// Message Repository
+			services.AddScoped<IMessageRepository, MessageRepository>();
+
 			// AutoMapper
 			services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 

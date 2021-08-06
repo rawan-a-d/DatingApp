@@ -27,6 +27,13 @@ namespace API.Data
 		public DbSet<UserLike> Likes { get; set; }
 
 		/// <summary>
+		/// Represents a table in the db called Messages
+		/// </summary>
+		/// <value></value>
+		public DbSet<Message> Messages { get; set; }
+
+
+		/// <summary>
 		/// This method is needed to setup the many to many relationship in like table
 		/// </summary>
 		/// <param name="builder"></param>
@@ -56,6 +63,18 @@ namespace API.Data
 				.WithMany(l => l.LikedByUsers)
 				.HasForeignKey(s => s.LikedUserId)
 				.OnDelete(DeleteBehavior.Cascade);
+
+
+			// Configure Message, AppUser relationship
+			builder.Entity<Message>()
+				.HasOne(u => u.Recipient)
+				.WithMany(m => m.MessagesReceived)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.Entity<Message>()
+				.HasOne(u => u.Sender)
+				.WithMany(m => m.MessagesSent)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

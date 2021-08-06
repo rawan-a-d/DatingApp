@@ -28,6 +28,11 @@ namespace API.Entities
 		// Users this user liked 
 		public ICollection<UserLike> LikedUsers { get; set; }
 
+		// Messages
+		public ICollection<Message> MessagesSent { get; set; }
+		public ICollection<Message> MessagesReceived { get; set; }
+
+
 		// Using this in AutoMapperProfiles makes the select query more efficient
 		//public int GetAge() {
 		//	return DateOfBirth.CalculateAge();

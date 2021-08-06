@@ -9,6 +9,7 @@ import { PaginatedResult } from '../_models/pagination';
 import { User } from '../_models/user';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
+import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 //const httpOptions = {
 //	headers: new HttpHeaders({
@@ -71,7 +72,7 @@ export class MembersService {
 
 		// Query params:
 		// pagination
-		let params = this.getPaginationHeaders(
+		let params = getPaginationHeaders(
 			userParams.pageNumber,
 			userParams.pageSize
 		);
@@ -87,9 +88,10 @@ export class MembersService {
 		params = params.append('orderBy', userParams.orderBy);
 
 		// get paginated result of Member array
-		return this.getPaginatedResult<Member[]>(
+		return getPaginatedResult<Member[]>(
 			this.baseUrl + 'users',
-			params
+			params,
+			this.http
 		).pipe(
 			map((res) => {
 				// save in cache
@@ -146,49 +148,12 @@ export class MembersService {
 	}
 
 	getLikes(predicate: string, pageNumber: number, pageSize: number) {
-		let params = this.getPaginationHeaders(pageNumber, pageSize);
+		let params = getPaginationHeaders(pageNumber, pageSize);
 		params = params.append('predicate', predicate);
-		return this.getPaginatedResult<Partial<Member[]>>(
+		return getPaginatedResult<Partial<Member[]>>(
 			this.baseUrl + 'likes',
-			params
+			params,
+			this.http
 		);
-	}
-
-	// get paginated result of generic type
-	private getPaginatedResult<T>(url: string, params: HttpParams) {
-		// Paginated result
-		const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
-
-		return this.http
-			.get<T>(url, {
-				observe: 'response',
-				params, // add params
-			})
-			.pipe(
-				// save members to members list
-				map((response) => {
-					paginatedResult.result = response.body;
-
-					// get pagination info from header
-					if (response.headers.get('Pagination') !== null) {
-						paginatedResult.pagination = JSON.parse(
-							response.headers.get('Pagination')
-						);
-					}
-
-					return paginatedResult;
-				})
-			);
-	}
-
-	// Add pagination headers
-	private getPaginationHeaders(pageNumber: number, pageSize: number) {
-		// create http params
-		let params = new HttpParams();
-
-		params = params.append('pageNumber', pageNumber);
-		params = params.append('pageSize', pageSize);
-
-		return params;
 	}
 }
