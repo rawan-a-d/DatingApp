@@ -1,13 +1,18 @@
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
 	/// <summary>
 	/// This class will access the bridge between our code and the db
-	/// It inherits from DbContext, a class from Entity framework
+	/// It inherits from IdentityDbContext, a class from Entity framework package (Microsoft.AspNetCore.Identity.EntityFrameworkCore)
+	/// We need to define the classes and the type of key we're using if it is not a string
 	/// </summary>
-	public class DataContext : DbContext
+	public class DataContext : IdentityDbContext<AppUser, AppRole, int, 
+		IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, 
+		IdentityRoleClaim<int>, IdentityUserToken<int>>
 	{
 		public DataContext(DbContextOptions options) : base(options)
 		{
@@ -16,9 +21,10 @@ namespace API.Data
 		
 		/// <summary>
 		/// Represents a table in the db called Users
+		/// Provided by Identity
 		/// </summary>
 		/// <value></value>
-		public DbSet<AppUser> Users { get; set; }
+		//public DbSet<AppUser> Users { get; set; }
 
 		/// <summary>
 		/// Represents a table in the db called Likes
@@ -75,6 +81,20 @@ namespace API.Data
 				.HasOne(u => u.Sender)
 				.WithMany(m => m.MessagesSent)
 				.OnDelete(DeleteBehavior.Restrict);
+
+
+			// Configure AppUser, AppRole relationship
+			builder.Entity<AppUser>()
+				.HasMany(ur => ur.UserRoles)
+				.WithOne(u => u.User)
+				.HasForeignKey(ur => ur.UserId)
+				.IsRequired();
+
+			builder.Entity<AppRole>()
+				.HasMany(ur => ur.UserRoles)
+				.WithOne(u => u.Role)
+				.HasForeignKey(ur => ur.RoleId)
+				.IsRequired();	
 		}
 	}
 }

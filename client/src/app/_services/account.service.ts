@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ThrowStmt } from '@angular/compiler';
 import { Injectable } from '@angular/core';
+import { isArray } from 'ngx-bootstrap/chronos';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -41,6 +42,12 @@ export class AccountService {
 
 	// set the currentUserSource and save the user into local storage
 	setCurrentUser(user: User) {
+		// get user roles
+		user.roles = [];
+		const roles = this.getDecodedToken(user.token).role;
+		// if array (more than one role) or just a string (one role)
+		Array.isArray(roles) ? (user.roles = roles) : user.roles.push(roles);
+
 		// save user in local storage
 		localStorage.setItem('user', JSON.stringify(user));
 
@@ -67,5 +74,11 @@ export class AccountService {
 				}
 			})
 		);
+	}
+
+	// Get decoded token
+	getDecodedToken(token) {
+		// get payload (data)
+		return JSON.parse(atob(token.split('.')[1]));
 	}
 }

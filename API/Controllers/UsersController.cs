@@ -44,6 +44,7 @@ namespace API.Controllers
 		/// <returns> a list of users </returns>
 		///
 		//[AllowAnonymous]
+		//[Authorize(Roles = "Admin")]
 		[HttpGet] // api/users
 		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
 		{
@@ -73,6 +74,7 @@ namespace API.Controllers
 		/// <returns> a user with specified id </returns>
 		///
 		//[Authorize] 
+		//[Authorize(Roles = "Member")]
 		[HttpGet("{username}", Name = "GetUser")] // api/users/lisa
 		public async Task<ActionResult<MemberDto>> GetUser(string username)
 		{

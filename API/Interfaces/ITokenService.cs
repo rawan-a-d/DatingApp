@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using API.Entities;
 
 namespace API.Interfaces
@@ -7,6 +8,6 @@ namespace API.Interfaces
 	// 2. Best practice
 	public interface ITokenService
 	{
-		string CreateToken(AppUser user);
+		Task<string> CreateToken(AppUser user);
 	}
 }

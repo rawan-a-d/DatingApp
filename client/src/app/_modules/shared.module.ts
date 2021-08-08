@@ -10,6 +10,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { TimeagoModule } from 'ngx-timeago';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 // Tidying up the app module by using a shared module for non angular modules
 @NgModule({
@@ -48,6 +49,9 @@ import { TimeagoModule } from 'ngx-timeago';
 		// Time ago
 		// https://www.npmjs.com/package/ngx-timeago
 		TimeagoModule.forRoot(),
+		// Modal to edit roles
+		// https://valor-software.com/ngx-bootstrap/#/modals
+		ModalModule.forRoot(),
 	],
 	// Need to export the modules in order to work in app.module
 	exports: [
@@ -61,6 +65,7 @@ import { TimeagoModule } from 'ngx-timeago';
 		PaginationModule,
 		ButtonsModule,
 		TimeagoModule,
+		ModalModule,
 	],
 })
 export class SharedModule {}
