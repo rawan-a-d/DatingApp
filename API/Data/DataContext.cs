@@ -38,6 +38,18 @@ namespace API.Data
 		/// <value></value>
 		public DbSet<Message> Messages { get; set; }
 
+		/// <summary>
+		/// Represents a table in the db called Groups
+		/// </summary>
+		/// <value></value>
+		public DbSet<Group> Groups { get; set; }
+
+		/// <summary>
+		/// Represents a table in the db called Connections
+		/// </summary>
+		/// <value></value>
+		public DbSet<Connection> Connections { get; set; }
+
 
 		/// <summary>
 		/// This method is needed to setup the many to many relationship in like table

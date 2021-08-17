@@ -2,6 +2,7 @@ using API.Data;
 using API.Helpers;
 using API.Interfaces;
 using API.Services;
+using API.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,6 +56,9 @@ namespace API.Extensions
 				// we get connection string from appsettings.Development
 				options.UseSqlite(config.GetConnectionString("DefaultConnection"));
 			});
+
+			// Presence Tracker
+			services.AddSingleton<PresenceTracker>();
 
 			return services;
 		}

@@ -8,6 +8,7 @@ using API.Extensions;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -64,6 +65,9 @@ namespace API
 			// Extension method
 			// code inside this method was HERE
 			services.AddIdentityServices(_config);
+
+			// SignalR
+			services.AddSignalR();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,8 +92,10 @@ namespace API
 			app.UseRouting();
 
 			// CORS (Cross Origin Requests) support
-			app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod()
-				.WithOrigins("https://localhost:4200"));
+			app.UseCors(policy => policy.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials() // for SignalR
+			.WithOrigins("https://localhost:4200"));
 
 			// authenticate that the user has a jwt when there's an Authenticate above the route
 			app.UseAuthentication();
@@ -98,6 +104,10 @@ namespace API
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
+
+				// SignalR
+				endpoints.MapHub<PresenceHub>("hubs/presence");
+				endpoints.MapHub<MessageHub>("hubs/message");
 			});
 		}
 	}

@@ -6,6 +6,7 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
+import { PresenceService } from './presence.service';
 
 // This service can be injected into other components or services
 // It is also a Singleton
@@ -23,7 +24,7 @@ export class AccountService {
 	// create an observable to be observed by other components, classes
 	currentUser$ = this.currentUserSource.asObservable();
 
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient, private presence: PresenceService) {}
 
 	// Login
 	login(model: any) {
@@ -35,6 +36,9 @@ export class AccountService {
 				if (user) {
 					// set the currentUserSource and save the user into local storage
 					this.setCurrentUser(user);
+
+					// connect to hub
+					this.presence.createHubConnection(user);
 				}
 			})
 		);
@@ -52,6 +56,9 @@ export class AccountService {
 		localStorage.setItem('user', JSON.stringify(user));
 
 		this.currentUserSource.next(user);
+
+		//// connect to hub
+		//this.presence.createHubConnection(user);
 	}
 
 	// Logout
@@ -61,6 +68,9 @@ export class AccountService {
 		// empty the currentUserSource
 		this.currentUserSource.next(null);
 		//this.currentUserSource.next(undefined);
+
+		// stop hub connection
+		this.presence.stopHubConnection();
 	}
 
 	// Register
@@ -71,6 +81,9 @@ export class AccountService {
 				if (user) {
 					// set the currentUserSource and save the user into local storage
 					this.setCurrentUser(user);
+
+					// connect to hub
+					this.presence.createHubConnection(user);
 				}
 			})
 		);

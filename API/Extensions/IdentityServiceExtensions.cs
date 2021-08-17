@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,6 +42,25 @@ namespace API.Extensions
 							IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
 							ValidateIssuer = false, // API server
 							ValidateAudience = false, // Angular client
+						};
+
+						// SignalR Authenticating: can't use Authorization header so have to use query strings
+						options.Events = new JwtBearerEvents
+						{
+							OnMessageReceived = context =>
+							{
+								var accessToken = context.Request.Query["access_token"];
+
+								var path = context.HttpContext.Request.Path;
+
+								// if there is a token and request is sent to hubs/
+								if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+								{
+									context.Token = accessToken;
+								}
+
+								return Task.CompletedTask;
+							}
 						};
 					});
 
