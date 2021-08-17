@@ -21,7 +21,14 @@ namespace API.SignalR
 			new Dictionary<string, List<string>>();
 
 
-		public Task UserConnected(string username, string connectionId) {
+		/// <summary>
+		/// When a user connects
+		/// </summary>
+		/// <param name="username">the username</param>
+		/// <param name="connectionId">the connection id</param>
+		/// <returns>true if first connection, otherwise false</returns>
+		public Task<bool> UserConnected(string username, string connectionId) {
+			bool isOnline = false;
 			// Lock dictionary until we're done
 			lock (OnlineUsers) {
 				// if an entry was made for this user
@@ -30,10 +37,13 @@ namespace API.SignalR
 				}
 				else {
 					OnlineUsers.Add(username, new List<string>(){ connectionId });
+
+					isOnline = true;
 				}
 			}
-
-			return Task.CompletedTask;
+			
+			return Task.FromResult(isOnline);
+			//return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -42,13 +52,16 @@ namespace API.SignalR
 		/// <param name="username">the username</param>
 		/// <param name="connectionId">the connection id</param>
 		/// <returns></returns>
-		public Task UserDisconnected(string username, string connectionId) {
+		public Task<bool> UserDisconnected(string username, string connectionId) {
+			bool isOffile = false;
+
 			// Lock dictionary until we're done
 			lock (OnlineUsers)
 			{
 				// if no key
 				if (!OnlineUsers.ContainsKey(username)) {
-					return Task.CompletedTask;
+					//return Task.CompletedTask;
+					return Task.FromResult(isOffile);
 				}
 
 				// remove connection id
@@ -56,10 +69,13 @@ namespace API.SignalR
 				// if no more connections for this user
 				if(OnlineUsers[username].Count == 0) {
 					OnlineUsers.Remove(username);
+
+					isOffile = true;
 				}
 			}
 
-			return Task.CompletedTask;
+			//return Task.CompletedTask;
+			return Task.FromResult(isOffile);
 		}
 
 		/// <summary>

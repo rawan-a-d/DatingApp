@@ -41,12 +41,22 @@ export class PresenceService {
 		// listen for UserIsOnline event/method from server
 		// informing us that a user has connected
 		this.hubConnection.on('UserIsOnline', (username) => {
-			this.toastr.info(username + ' has connected');
+			//this.toastr.info(username + ' has connected');
+			// add new online user to onlineUsersSource
+			this.onlineUsers$.pipe(take(1)).subscribe((usernames) => {
+				this.onlineUsersSource.next([...usernames, username]);
+			});
 		});
 
 		// listen for UserIsOffline event from server
 		this.hubConnection.on('UserIsOffline', (username) => {
-			this.toastr.warning(username + ' has disconnected');
+			//this.toastr.warning(username + ' has disconnected');
+			// remove user from onlineUsersSource
+			this.onlineUsers$.pipe(take(1)).subscribe((usernames) => {
+				this.onlineUsersSource.next([
+					...usernames.filter((x) => x !== username),
+				]);
+			});
 		});
 
 		// listen for GetOnlineUsers event from server

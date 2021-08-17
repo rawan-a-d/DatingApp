@@ -54,11 +54,17 @@ namespace API.SignalR
 
 			// group tracking
 			// add user to group
-			await AddToGroup(groupName);
+			var group = await AddToGroup(groupName);
+			// send the updated group back, if it's empty SignalR doesn't send anything back
+			await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
 			var messages = await _messageRepository.GetMessageThread(callerUser, otherUser);
 
-			await Clients.Group(groupName).SendAsync("ReceiveMessageThread", messages);
+			// send message thread to both of the connected users
+			//await Clients.Group(groupName).SendAsync("ReceiveMessageThread", messages);
+
+			// send message thread to the user who connected
+			await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
 		}
 
 
@@ -71,7 +77,10 @@ namespace API.SignalR
 		{
 			// group tracking
 			// remove user from group
-			await RemoveFromMessageGroup();
+			var group = await RemoveFromMessageGroup();
+
+			// send the updated group back, if it's empty SignalR doesn't send anything back
+			await Clients.Group(group.Name).SendAsync("UpdatedGroup", group);
 
 			// will be removed automatically
 			await base.OnDisconnectedAsync(ex);
@@ -166,8 +175,8 @@ namespace API.SignalR
 		/// Add user to group
 		/// </summary>
 		/// <param name="groupName">group name</param>
-		/// <returns>true or false</returns>
-		private async Task<bool> AddToGroup(string groupName)
+		/// <returns>the group</returns>
+		private async Task<Group> AddToGroup(string groupName)
 		{
 			// get group
 			var group = await _messageRepository.GetMessageGroup(groupName);
@@ -185,20 +194,33 @@ namespace API.SignalR
 			// add new connection to the group
 			group.Connections.Add(connection);
 
-			return await _messageRepository.SaveAllAsync();
+			if(await _messageRepository.SaveAllAsync()) {
+				return group;
+			}
+
+			throw new HubException("Failed to join group");
 		}
 
 		/// <summary>
 		/// Remove connection from group
 		/// </summary>
-		/// <returns></returns>
-		private async Task RemoveFromMessageGroup()
+		/// <returns>the group</returns>
+		private async Task<Group> RemoveFromMessageGroup()
 		{
-			var connection = await _messageRepository.GetConnection(Context.ConnectionId);
+			//var connection = await _messageRepository.GetConnection(Context.ConnectionId);
 
+			// get group
+			var group = await _messageRepository.GetGroupForConnection(Context.ConnectionId);
+			var connection = group.Connections.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+
+			// remove connection
 			_messageRepository.RemoveConnection(connection);
 
-			await _messageRepository.SaveAllAsync();
+			if(await _messageRepository.SaveAllAsync()) {
+				return group;
+			}
+
+			throw new HubException("Failed to remove from group");
 		}
 	}
 }

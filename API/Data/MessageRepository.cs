@@ -62,6 +62,19 @@ namespace API.Data
 			return await _context.Connections.FindAsync(connectionId);
 		}
 
+		/// <summary>
+		/// Get group by connection id
+		/// </summary>
+		/// <param name="connectionId">the connection id</param>
+		/// <returns>the group</returns>
+		public async Task<Group> GetGroupForConnection(string connectionId)
+		{
+			return await _context.Groups
+				.Include(c => c.Connections)
+				.Where(c => c.Connections.Any(x => x.ConnectionId == connectionId))
+				.FirstOrDefaultAsync();
+		}
+
 
 		/// <summary>
 		/// Get a specific message
