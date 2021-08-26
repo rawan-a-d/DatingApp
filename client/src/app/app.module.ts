@@ -33,6 +33,7 @@ import { UserManagementComponent } from './admin/user-management/user-management
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { RolesModalComponent } from './modals/roles-modal/roles-modal.component';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { ConfirmDialogComponent } from './modals/confirm-dialog/confirm-dialog.component';
 
 // Decorator for Angular Module
 @NgModule({
@@ -62,6 +63,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 		UserManagementComponent,
 		PhotoManagementComponent,
 		RolesModalComponent,
+  ConfirmDialogComponent,
 	],
 	// Angular Modules
 	imports: [

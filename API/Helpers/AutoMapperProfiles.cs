@@ -51,7 +51,8 @@ namespace API.Helpers
 
 			// For date
 			// add Z to dates before returning them to the client
-			CreateMap<DateTime, DateTime>().ConvertUsing(d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
+			// not needed, added in the DataContext
+			//CreateMap<DateTime, DateTime>().ConvertUsing(d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
 		}
 	}
 }

@@ -14,37 +14,55 @@ namespace API.Controllers
 	[Authorize]
 	public class LikesController : BaseApiController
 	{
-		private readonly IUserRepository _userRepository;
-		private readonly ILikesRepository _likesRepository;
-		public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
+		//private readonly IUserRepository _userRepository;
+		//private readonly ILikesRepository _likesRepository;
+		//public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
+		//{
+		//	_userRepository = userRepository;
+		//	_likesRepository = likesRepository;
+		//}
+		private readonly IUnitOfWork _unitOfWork;
+		public LikesController(IUnitOfWork unitOfWork)
 		{
-			_userRepository = userRepository;
-			_likesRepository = likesRepository;
+			_unitOfWork = unitOfWork;
+
 		}
 
 		[HttpPost("{username}")] // likes/todd
-		public async Task<ActionResult> AddLike(string username) {
+		public async Task<ActionResult> AddLike(string username)
+		{
 			// get current user id
 			var sourceUserId = User.GetUserId();
 
+			//// get liked user
+			//var likedUser = await _userRepository.GetUserByUsernameAsync(username);
+			//// get current user with likes
+			//var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
+
 			// get liked user
-			var likedUser = await _userRepository.GetUserByUsernameAsync(username);
+			var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			// get current user with likes
-			var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
+			var sourceUser = await _unitOfWork.LikesRepository.GetUserWithLikes(sourceUserId);
 
 			// if liked user is not found
-			if(likedUser == null) {
+			if (likedUser == null)
+			{
 				return NotFound();
 			}
 			// if user is trying to like himself
-			if(likedUser == sourceUser) {
+			if (likedUser == sourceUser)
+			{
 				return BadRequest("You cannot like yourself");
 			}
 
-			// if user is already liked
-			var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+			//// if user is already liked
+			//var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
 
-			if(userLike != null) {
+						// if user is already liked
+			var userLike = await _unitOfWork.LikesRepository.GetUserLike(sourceUserId, likedUser.Id);
+
+			if (userLike != null)
+			{
 				return BadRequest("You already liked " + username);
 			}
 
@@ -56,7 +74,12 @@ namespace API.Controllers
 			};
 			sourceUser.LikedUsers.Add(userLike);
 
-			if(await _userRepository.SaveAllAsync()) {
+			//if (await _userRepository.SaveAllAsync())
+			//{
+			//	return Ok();
+			//}
+			if (await _unitOfWork.Complete())
+			{
 				return Ok();
 			}
 
@@ -81,9 +104,11 @@ namespace API.Controllers
 		/// <param name="likesParams">likesParams object</param>
 		/// <returns>a list of LikeDto</returns>
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery]LikesParams likesParams) {
+		public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+		{
 			likesParams.UserId = User.GetUserId();
-			var users = await _likesRepository.GetUserLikes(likesParams);
+			//var users = await _likesRepository.GetUserLikes(likesParams);
+			var users = await _unitOfWork.LikesRepository.GetUserLikes(likesParams);
 
 			// Add pagination header
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
@@ -98,7 +123,8 @@ namespace API.Controllers
 		/// <returns>AppUser object which contains the list</returns>
 		public async Task<AppUser> GetUserWithLikes(int userId)
 		{
-			return await _likesRepository.GetUserWithLikes(userId);
+			//return await _likesRepository.GetUserWithLikes(userId);
+			return await _unitOfWork.LikesRepository.GetUserWithLikes(userId);
 		}
 
 

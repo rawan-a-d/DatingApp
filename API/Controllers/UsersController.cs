@@ -23,14 +23,22 @@ namespace API.Controllers
 	[Authorize]
 	public class UsersController : BaseApiController
 	{
-		private readonly IUserRepository _userRepository;
+		private readonly IUnitOfWork _unitOfWork;
+
+		//private readonly IUserRepository _userRepository;
 		private readonly IMapper _mapper;
 		private readonly IPhotoService _photoService;
-		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService)
+		//public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService)
+		//{
+		//	_photoService = photoService;
+		//	_mapper = mapper;
+		//	_userRepository = userRepository;
+		//}
+		public UsersController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService)
 		{
 			_photoService = photoService;
+			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_userRepository = userRepository;
 		}
 
 
@@ -49,17 +57,23 @@ namespace API.Controllers
 		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
 		{
 			// get current user
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			//var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			// get gender
+			var gender = await _unitOfWork.UserRepository.GetUserGender(User.GetUsername());
 
-			userParams.CurrentUsename = user.UserName;
+			//userParams.CurrentUsename = user.UserName;
+			userParams.CurrentUsename = User.GetUsername();
 
 			// if no gender is selected, use opposite gender
 			if(string.IsNullOrEmpty(userParams.Gender)) {
-				userParams.Gender = user.Gender == "male" ? "female" : "male";
+				//userParams.Gender = user.Gender == "male" ? "female" : "male";
+				userParams.Gender = gender == "male" ? "female" : "male";
 			}
 
 			// get all users using query parameters
-			var users = await _userRepository.GetMembersAsync(userParams);
+			//var users = await _userRepository.GetMembersAsync(userParams);
+			var users = await _unitOfWork.UserRepository.GetMembersAsync(userParams);
 
 			// add pagination header to response
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
@@ -78,7 +92,8 @@ namespace API.Controllers
 		[HttpGet("{username}", Name = "GetUser")] // api/users/lisa
 		public async Task<ActionResult<MemberDto>> GetUser(string username)
 		{
-			var user = await _userRepository.GetMemberAsync(username);
+			//var user = await _userRepository.GetMemberAsync(username);
+			var user = await _unitOfWork.UserRepository.GetMemberAsync(username);
 
 			return user;
 		}
@@ -97,19 +112,26 @@ namespace API.Controllers
 			var username = User.GetUsername();
 
 			// get user by username
-			var user = await _userRepository.GetUserByUsernameAsync(username);
+			//var user = await _userRepository.GetUserByUsernameAsync(username);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			// map from MemberUpdateDto to AppUser
 			_mapper.Map(memberUpdateDto, user);
 
 			// flag user as changed
-			_userRepository.Update(user);
+			//_userRepository.Update(user);
+			_unitOfWork.UserRepository.Update(user);
 
 			// push changes to db
-			if (await _userRepository.SaveAllAsync())
+			//if (await _userRepository.SaveAllAsync())
+			//{
+			//	return NoContent();
+			//}
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
+
 			return BadRequest("Failed to update user");
 		}
 
@@ -121,7 +143,8 @@ namespace API.Controllers
 			var username = User.GetUsername();
 
 			// get user object with the photos
-			var user = await _userRepository.GetUserByUsernameAsync(username);
+			//var user = await _userRepository.GetUserByUsernameAsync(username);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			// add new photo to Cloudinary
 			var result = await _photoService.AddPhotoAsync(file);
@@ -148,7 +171,14 @@ namespace API.Controllers
 			user.Photos.Add(photo);
 
 			// save changes to db
-			if(await _userRepository.SaveAllAsync()) {
+			//if(await _userRepository.SaveAllAsync()) {
+			//	// created 201 response and location header for the user (https://localhost:5001/api/Users/lisa)
+			//	return CreatedAtRoute("GetUser", new {username = user.UserName}, _mapper.Map<PhotoDto>(photo));
+
+			//	// return photo
+			//	//return _mapper.Map<PhotoDto>(photo);
+			//}
+			if(await _unitOfWork.Complete()) {
 				// created 201 response and location header for the user (https://localhost:5001/api/Users/lisa)
 				return CreatedAtRoute("GetUser", new {username = user.UserName}, _mapper.Map<PhotoDto>(photo));
 
@@ -168,7 +198,8 @@ namespace API.Controllers
 		public async Task<ActionResult> SetMainPhoto(int photoId) 
 		{
 			// get user
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			// find photo
 			var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
@@ -188,7 +219,10 @@ namespace API.Controllers
 			photo.IsMain = true;
 
 			// save to db
-			if(await _userRepository.SaveAllAsync()) {
+			//if(await _userRepository.SaveAllAsync()) {
+			//	return NoContent();
+			//}
+			if(await _unitOfWork.Complete()) {
 				return NoContent();
 			}
 
@@ -204,7 +238,8 @@ namespace API.Controllers
 		public async Task<ActionResult> DeletePhoto(int photoId) 
 		{
 			// get user
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			// find photo
 			var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
@@ -255,7 +290,10 @@ namespace API.Controllers
 
 
 			// save to db
-			if(await _userRepository.SaveAllAsync()) {
+			//if(await _userRepository.SaveAllAsync()) {
+			//	return Ok();
+			//}
+			if(await _unitOfWork.Complete()) {
 				return Ok();
 			}
 

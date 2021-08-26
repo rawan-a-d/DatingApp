@@ -38,13 +38,16 @@ namespace API.Extensions
 			services.AddScoped<ITokenService, TokenService>();
 
 			// User Repository
-			services.AddScoped<IUserRepository, UserRepository>();
+			//services.AddScoped<IUserRepository, UserRepository>();
 
 			// Likes Repository
-			services.AddScoped<ILikesRepository, LikesRepository>();
+			//services.AddScoped<ILikesRepository, LikesRepository>();
 
 			// Message Repository
-			services.AddScoped<IMessageRepository, MessageRepository>();
+			//services.AddScoped<IMessageRepository, MessageRepository>();
+
+			// Unit of Work
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			// AutoMapper
 			services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
