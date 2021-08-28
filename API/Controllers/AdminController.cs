@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +18,12 @@ namespace API.Controllers
 	public class AdminController : BaseApiController
 	{
 		private readonly UserManager<AppUser> _userManager;
-		public AdminController(UserManager<AppUser> userManager)
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly IPhotoService _photoService;
+		public AdminController(UserManager<AppUser> userManager, IUnitOfWork unitOfWork, IPhotoService photoService)
 		{
+			_photoService = photoService;
+			_unitOfWork = unitOfWork;
 			_userManager = userManager;
 		}
 
@@ -33,7 +39,8 @@ namespace API.Controllers
 				.Include(r => r.UserRoles)
 				.ThenInclude(r => r.Role)
 				.OrderBy(u => u.UserName)
-				.Select(u => new { // project
+				.Select(u => new
+				{ // project
 					u.Id,
 					Username = u.UserName,
 					Roles = u.UserRoles.Select(r => r.Role.Name).ToList()
@@ -52,7 +59,7 @@ namespace API.Controllers
 		/// <returns></returns>
 		//[Authorize(Policy = "")]
 		[HttpPost("edit-roles/{username}")]
-		public async Task<ActionResult> EditRoles(string username, [FromQuery] string roles) 
+		public async Task<ActionResult> EditRoles(string username, [FromQuery] string roles)
 		{
 			// split roles by comma
 			var selectedRoles = roles.Split(",").ToArray();
@@ -60,7 +67,8 @@ namespace API.Controllers
 			// get user by username
 			var user = await _userManager.FindByNameAsync(username);
 
-			if(user == null) {
+			if (user == null)
+			{
 				return NotFound("Could not find user");
 			}
 
@@ -70,14 +78,16 @@ namespace API.Controllers
 			// add roles to user unless they are already there
 			var result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
 
-			if(!result.Succeeded) {
+			if (!result.Succeeded)
+			{
 				return BadRequest("Failed to add to roles");
 			}
 
 			// remove roles which weren't added
 			result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
 
-			if(!result.Succeeded) {
+			if (!result.Succeeded)
+			{
 				BadRequest("Failed t remove from roles");
 			}
 
@@ -86,14 +96,91 @@ namespace API.Controllers
 
 
 		/// <summary>
-		/// Get photos
+		/// Get photos for approval
+		/// </summary>
+		/// <returns>list of unapproved photos</returns>
+		[Authorize(Policy = "ModeratePhotoRole")]
+		[HttpGet("photos-to-moderate")]
+		public async Task<ActionResult<IEnumerable<PhotoForApprovalDto>>> GetPhotosForModeration()
+		{
+			var photos = await _unitOfWork.PhotoRepository.GetUnapprovedPhotos();
+
+			return Ok(photos);
+		}
+
+
+		/// <summary>
+		/// Approve photo by id
 		/// </summary>
 		/// <returns></returns>
 		[Authorize(Policy = "ModeratePhotoRole")]
-		[HttpGet("photos-to-moderate")]
-		public ActionResult GetPhotosForModeration()
+		[HttpPost("approve-photo/{photoId}")]
+		public async Task<ActionResult> ApprovePhoto(int photoId)
 		{
-			return Ok("Admins or moderators can see this");
+			var photo = await _unitOfWork.PhotoRepository.GetPhotoById(photoId);
+
+			if (photo == null)
+			{
+				return NotFound("Photo was not found");
+			}
+
+			photo.IsApproved = true;
+
+			// get user
+			var user = await _unitOfWork.UserRepository.GetUserByPhotoId(photoId);
+
+			// if user has no main photo
+			if (string.IsNullOrEmpty(user.PhotoUrl))
+			{
+				photo.IsMain = true;
+			}
+			//if (!user.Photos.Any(x => x.IsMain)) photo.IsMain = true;
+
+			if (await _unitOfWork.Complete())
+			{
+				return Ok();
+			}
+
+			return BadRequest("Photo cannot be approved");
+		}
+
+
+		/// <summary>
+		/// Reject photo by id
+		/// </summary>
+		/// <returns></returns>
+		[Authorize(Policy = "ModeratePhotoRole")]
+		[HttpPost("reject-photo/{photoId}")]
+		public async Task<ActionResult> RejectPhoto(int photoId)
+		{
+			var photo = await _unitOfWork.PhotoRepository.GetPhotoById(photoId);
+
+			if (photo == null) return NotFound("Could not find photo");
+
+
+			//_unitOfWork.PhotoRepository.RemovePhoto(photoId);
+
+			// if photo ha public id from Cloudinary
+			if (photo.PublicId != null)
+			{
+				// delete photo from Cloudinary
+				var result = await _photoService.DeletePhotoAsync(photo.PublicId);
+
+				if (result.Result == "ok") {
+					_unitOfWork.PhotoRepository.RemovePhoto(photo);
+				}
+			}
+			else
+			{
+				_unitOfWork.PhotoRepository.RemovePhoto(photo);
+			}
+
+			if (await _unitOfWork.Complete())
+			{
+				return Ok();
+			}
+
+			return BadRequest("Photo cannot be removed");
 		}
 	}
 }

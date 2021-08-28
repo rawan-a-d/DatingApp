@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
@@ -14,13 +13,6 @@ namespace API.Controllers
 	[Authorize]
 	public class LikesController : BaseApiController
 	{
-		//private readonly IUserRepository _userRepository;
-		//private readonly ILikesRepository _likesRepository;
-		//public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
-		//{
-		//	_userRepository = userRepository;
-		//	_likesRepository = likesRepository;
-		//}
 		private readonly IUnitOfWork _unitOfWork;
 		public LikesController(IUnitOfWork unitOfWork)
 		{
@@ -33,11 +25,6 @@ namespace API.Controllers
 		{
 			// get current user id
 			var sourceUserId = User.GetUserId();
-
-			//// get liked user
-			//var likedUser = await _userRepository.GetUserByUsernameAsync(username);
-			//// get current user with likes
-			//var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
 
 			// get liked user
 			var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
@@ -55,10 +42,7 @@ namespace API.Controllers
 				return BadRequest("You cannot like yourself");
 			}
 
-			//// if user is already liked
-			//var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
-
-						// if user is already liked
+			// if user is already liked
 			var userLike = await _unitOfWork.LikesRepository.GetUserLike(sourceUserId, likedUser.Id);
 
 			if (userLike != null)
@@ -74,10 +58,6 @@ namespace API.Controllers
 			};
 			sourceUser.LikedUsers.Add(userLike);
 
-			//if (await _userRepository.SaveAllAsync())
-			//{
-			//	return Ok();
-			//}
 			if (await _unitOfWork.Complete())
 			{
 				return Ok();
@@ -123,7 +103,6 @@ namespace API.Controllers
 		/// <returns>AppUser object which contains the list</returns>
 		public async Task<AppUser> GetUserWithLikes(int userId)
 		{
-			//return await _likesRepository.GetUserWithLikes(userId);
 			return await _unitOfWork.LikesRepository.GetUserWithLikes(userId);
 		}
 

@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
@@ -13,7 +10,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -24,16 +20,9 @@ namespace API.Controllers
 	public class UsersController : BaseApiController
 	{
 		private readonly IUnitOfWork _unitOfWork;
-
-		//private readonly IUserRepository _userRepository;
 		private readonly IMapper _mapper;
 		private readonly IPhotoService _photoService;
-		//public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService)
-		//{
-		//	_photoService = photoService;
-		//	_mapper = mapper;
-		//	_userRepository = userRepository;
-		//}
+
 		public UsersController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService)
 		{
 			_photoService = photoService;
@@ -56,23 +45,17 @@ namespace API.Controllers
 		[HttpGet] // api/users
 		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
 		{
-			// get current user
-			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			//var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			// get gender
 			var gender = await _unitOfWork.UserRepository.GetUserGender(User.GetUsername());
 
-			//userParams.CurrentUsename = user.UserName;
 			userParams.CurrentUsename = User.GetUsername();
 
 			// if no gender is selected, use opposite gender
 			if(string.IsNullOrEmpty(userParams.Gender)) {
-				//userParams.Gender = user.Gender == "male" ? "female" : "male";
 				userParams.Gender = gender == "male" ? "female" : "male";
 			}
 
 			// get all users using query parameters
-			//var users = await _userRepository.GetMembersAsync(userParams);
 			var users = await _unitOfWork.UserRepository.GetMembersAsync(userParams);
 
 			// add pagination header to response
@@ -92,8 +75,9 @@ namespace API.Controllers
 		[HttpGet("{username}", Name = "GetUser")] // api/users/lisa
 		public async Task<ActionResult<MemberDto>> GetUser(string username)
 		{
-			//var user = await _userRepository.GetMemberAsync(username);
-			var user = await _unitOfWork.UserRepository.GetMemberAsync(username);
+			var isCurrentUser = username == User.GetUsername();
+
+			var user = await _unitOfWork.UserRepository.GetMemberAsync(username, isCurrentUser);
 
 			return user;
 		}
@@ -108,25 +92,18 @@ namespace API.Controllers
 		public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
 		{
 			// get username from token
-			//var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			var username = User.GetUsername();
 
 			// get user by username
-			//var user = await _userRepository.GetUserByUsernameAsync(username);
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			// map from MemberUpdateDto to AppUser
 			_mapper.Map(memberUpdateDto, user);
 
 			// flag user as changed
-			//_userRepository.Update(user);
 			_unitOfWork.UserRepository.Update(user);
 
 			// push changes to db
-			//if (await _userRepository.SaveAllAsync())
-			//{
-			//	return NoContent();
-			//}
 			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
@@ -143,7 +120,6 @@ namespace API.Controllers
 			var username = User.GetUsername();
 
 			// get user object with the photos
-			//var user = await _userRepository.GetUserByUsernameAsync(username);
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			// add new photo to Cloudinary
@@ -163,27 +139,17 @@ namespace API.Controllers
 			};
 
 			// if user has no photos
-			if(user.Photos.Count == 0) {
-				photo.IsMain = true;
-			}
+			//if(user.Photos.Count == 0) {
+			//	photo.IsMain = true;
+			//}
 
 			// add photo to photos array
 			user.Photos.Add(photo);
 
 			// save changes to db
-			//if(await _userRepository.SaveAllAsync()) {
-			//	// created 201 response and location header for the user (https://localhost:5001/api/Users/lisa)
-			//	return CreatedAtRoute("GetUser", new {username = user.UserName}, _mapper.Map<PhotoDto>(photo));
-
-			//	// return photo
-			//	//return _mapper.Map<PhotoDto>(photo);
-			//}
 			if(await _unitOfWork.Complete()) {
 				// created 201 response and location header for the user (https://localhost:5001/api/Users/lisa)
 				return CreatedAtRoute("GetUser", new {username = user.UserName}, _mapper.Map<PhotoDto>(photo));
-
-				// return photo
-				//return _mapper.Map<PhotoDto>(photo);
 			}
 
 			return BadRequest("Problem adding photos");
@@ -198,7 +164,6 @@ namespace API.Controllers
 		public async Task<ActionResult> SetMainPhoto(int photoId) 
 		{
 			// get user
-			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			// find photo
@@ -208,20 +173,30 @@ namespace API.Controllers
 			if(photo.IsMain) {
 				return BadRequest("This is already your main photo");
 			}
+			// if photo is not approved
+			if(photo.IsApproved == false) {
+				return BadRequest("This photo is not approved");
+			}
 
 			// remove currentMain
+			//var currentMain = user.Photos.Where(x => x.IsMain).ToList();
 			var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
+
 			if(currentMain != null) {
 				currentMain.IsMain = false;
+				//for (int i = 0; i < currentMain.Count; i++)
+				//{
+				//	if(user.Photos.FirstOrDefault(x => x.Id == currentMain[i].Id).IsMain) {
+				//		//return BadRequest("This is already your main photo");
+				//		currentMain[i].IsMain = false;
+				//	}
+				//}
 			}
 
 			// set photo to main
 			photo.IsMain = true;
 
 			// save to db
-			//if(await _userRepository.SaveAllAsync()) {
-			//	return NoContent();
-			//}
 			if(await _unitOfWork.Complete()) {
 				return NoContent();
 			}
@@ -238,7 +213,6 @@ namespace API.Controllers
 		public async Task<ActionResult> DeletePhoto(int photoId) 
 		{
 			// get user
-			//var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			// find photo
@@ -290,9 +264,6 @@ namespace API.Controllers
 
 
 			// save to db
-			//if(await _userRepository.SaveAllAsync()) {
-			//	return Ok();
-			//}
 			if(await _unitOfWork.Complete()) {
 				return Ok();
 			}

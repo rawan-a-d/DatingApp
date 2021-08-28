@@ -1,9 +1,25 @@
 /* Images */
+.img-wrapper {
+	position: relative;
+	text-overflow: ellipsis;
+}
+
 img.img-thumbnail {
 	height: 100px;
 	min-width: 100px !important;
 	margin-bottom: 2px;
 }
+
+.img-text {
+	position: absolute;
+	bottom: 30%;
+	width: 120px;
+}
+
+.awaiting-approval {
+	opacity: 0.2;
+}
+
 
 
 /* Drop images zonde on hover */

@@ -18,5 +18,8 @@ namespace API.Entities
 		// but we need this, to change settings on delete and not allow user to be null
 		public AppUser AppUser { get; set; }
 		public int AppUserId { get; set; }
+
+		// was photo approved by admin
+		public bool IsApproved { get; set; } = false;
 	}
 }

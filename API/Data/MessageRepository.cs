@@ -83,8 +83,6 @@ namespace API.Data
 		/// <returns></returns>
 		public async Task<Message> GetMessage(int id)
 		{
-			//return await _context.Messages.FindAsync(id);
-
 			return await _context.Messages
 				.Include(u => u.Sender)
 				.Include(u => u.Recipient)
@@ -128,11 +126,7 @@ namespace API.Data
 				_ => query.Where(u => u.RecipientUsername == messageParams.Username && u.RecipientDeleted == false && u.DateRead == null)
 			};
 
-			// Project message to messageDto
-			//var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
-
 			// return paged messages
-			//return await PagedList<MessageDto>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
 			return await PagedList<MessageDto>.CreateAsync(query, messageParams.PageNumber, messageParams.PageSize);
 		}
 
@@ -146,10 +140,7 @@ namespace API.Data
 		public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
 		{
 			// get conversation of current user
-			var messages = await _context.Messages
-				// include users and photos (not needed when using projection)
-				//.Include(u => u.Sender).ThenInclude(p => p.Photos)
-				//.Include(u => u.Recipient).ThenInclude(p => p.Photos)				
+			var messages = await _context.Messages			
 				.Where(m =>
 					(m.SenderUsername == currentUsername && m.RecipientUsername == recipientUsername && m.SenderDeleted == false) ||
 					(m.SenderUsername == recipientUsername && m.RecipientUsername == currentUsername && m.RecipientDeleted == false)
@@ -163,15 +154,10 @@ namespace API.Data
 			var unreadMessages = messages.Where(m => m.DateRead == null && m.RecipientUsername == currentUsername).ToList();
 			if(unreadMessages.Any()) {
 				foreach(var message in unreadMessages) {
-					//message.DateRead = DateTime.Now;
 					message.DateRead = DateTime.UtcNow;
 				}
-
-				// save to db
-				//await _context.SaveChangesAsync();
 			}
 
-			//return _mapper.Map<IEnumerable<MessageDto>>(messages);
 			return messages;
 		}
 
@@ -183,15 +169,5 @@ namespace API.Data
 		{
 			_context.Connections.Remove(connection);
 		}
-
-
-		/// <summary>
-		/// Save to db
-		/// </summary>
-		/// <returns>true or false</returns>
-		//public async Task<bool> SaveAllAsync()
-		//{
-		//	return await _context.SaveChangesAsync() > 0;
-		//}
 	}
 }

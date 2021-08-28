@@ -31,4 +31,25 @@ export class AdminService {
 			{}
 		);
 	}
+
+	// get unapproved photos
+	getPhotosForApproval() {
+		return this.http.get(this.baseUrl + 'admin/photos-to-moderate');
+	}
+
+	// Approve photo
+	approvePhoto(photoId: number) {
+		return this.http.post(
+			this.baseUrl + 'admin/approve-photo/' + photoId,
+			{}
+		);
+	}
+
+	// Reject photo
+	rejectPhoto(photoId: number) {
+		return this.http.post(
+			this.baseUrl + 'admin/reject-photo/' + photoId,
+			{}
+		);
+	}
 }

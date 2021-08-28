@@ -23,6 +23,8 @@ namespace API.Data
 
 		public ILikesRepository LikesRepository => new LikesRepository(_context);
 
+		public IPhotoRepository PhotoRepository => new PhotoRepository(_context, _mapper);
+
 		/// <summary>
 		/// Save all changes to db
 		/// </summary>

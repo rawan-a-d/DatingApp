@@ -16,16 +16,8 @@ namespace API.Controllers
 	{
 		private readonly IUnitOfWork _unitOfWork;
 
-		//private readonly IMessageRepository _messageRepository;
 		private readonly IMapper _mapper;
-		//private readonly IUserRepository _userRepository;
 
-		//public MessagesController(IUserRepository userRepository, IMessageRepository messageRepository, IMapper mapper)
-		//{
-		//	_userRepository = userRepository;
-		//	_messageRepository = messageRepository;
-		//	_mapper = mapper;
-		//}
 		public MessagesController(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			_unitOfWork = unitOfWork;
@@ -47,10 +39,6 @@ namespace API.Controllers
 				return BadRequest("You cannot send a message to yourself");
 			}
 
-			// get users
-			//var sender = await _userRepository.GetUserByUsernameAsync(username);
-			//var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
-
 			var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
 
@@ -70,15 +58,10 @@ namespace API.Controllers
 			};
 
 			// add message
-			//_messageRepository.AddMessage(message);
 			_unitOfWork.MessageRepository.AddMessage(message);
 
 
 			// save to db
-			//if(await _messageRepository.SaveAllAsync()) {
-			//	// should return create at route
-			//	return Ok(_mapper.Map<MessageDto>(message));
-			//}
 			if(await _unitOfWork.Complete()) {
 				// should return create at route
 				return Ok(_mapper.Map<MessageDto>(message));
@@ -102,7 +85,6 @@ namespace API.Controllers
 			messageParams.Username = username;
 
 			// get messages
-			//var messages = await _messageRepository.GetMessagesForUser(messageParams);
 			var messages = await _unitOfWork.MessageRepository.GetMessagesForUser(messageParams);
 
 			Response.AddPaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages);
@@ -136,11 +118,9 @@ namespace API.Controllers
 		public async Task<ActionResult> DeleteMessage(int id) {
 			// get user
 			var username = User.GetUsername();
-			//var user = _userRepository.GetUserByUsernameAsync(username);
 			var user = _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			// get message
-			//var message = await _messageRepository.GetMessage(id);
 			var message = await _unitOfWork.MessageRepository.GetMessage(id);
 
 			// if not owner
@@ -158,14 +138,10 @@ namespace API.Controllers
 
 			// if both users deleted the message -> delete from db
 			if(message.SenderDeleted && message.RecipientDeleted) {
-				//_messageRepository.DeleteMessage(message);
 				_unitOfWork.MessageRepository.DeleteMessage(message);
 			}
 
 			// save to db
-			//if(await _messageRepository.SaveAllAsync()) {
-			//	return Ok();
-			//}
 			if(await _unitOfWork.Complete()) {
 				return Ok();
 			}

@@ -54,6 +54,11 @@ namespace API.Data
 		/// <value></value>
 		public DbSet<Connection> Connections { get; set; }
 
+		/// <summary>
+		/// Represents a table in the db called Photos
+		/// </summary>
+		/// <value></value>
+		public DbSet<Photo> Photos { get; set; }
 
 		/// <summary>
 		/// This method is needed to setup the many to many relationship in like table
@@ -111,6 +116,11 @@ namespace API.Data
 				.WithOne(u => u.Role)
 				.HasForeignKey(ur => ur.RoleId)
 				.IsRequired();
+
+			// Configure Photo
+			// get photos which are approved
+			builder.Entity<Photo>().HasQueryFilter(p => p.IsApproved);
+
 
 			// convert DateTime to UTC
 			builder.ApplyUtcDateTimeConverter();

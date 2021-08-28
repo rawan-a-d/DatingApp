@@ -13,9 +13,9 @@ namespace API.Data
 		/// <summary>
 		/// Adds seed data to db, called in Program.cs when the app is started
 		/// </summary>
-		/// /// <param name="context">db context</param>
 		/// <param name="userManager">userManager from Identity framework, which allows us to get users and update them....</param>
-		/// <returns>void</returns>
+		/// <param name="roleManager">roleManager from Identity framework</param>
+		/// <returns></returns>
 		public static async Task SeedUsers(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager) {
 			// check if users table contains any users
 			if(await userManager.Users.AnyAsync()) {
@@ -46,14 +46,9 @@ namespace API.Data
 
 
 			foreach(var user in users) {
-				//using var hmac = new HMACSHA512();
-
 				user.UserName = user.UserName.ToLower();
-				//user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd"));
-				//user.PasswordSalt = hmac.Key;
 
 				// track each user
-				//await context.Users.AddAsync(user);
 				await userManager.CreateAsync(user, "Pa$$w0rd"); // it also saves it to db
 
 				// add role to user
@@ -67,9 +62,6 @@ namespace API.Data
 			};
 			await userManager.CreateAsync(admin, "Pa$$w0rd");
 			await userManager.AddToRolesAsync(admin, new[] {"Admin", "Moderator"});
-
-			// save users to db
-			//await context.SaveChangesAsync();
 		}
 	}
 }
