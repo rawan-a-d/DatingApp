@@ -55,15 +55,16 @@ const routes: Routes = [
 				component: AdminPanelComponent,
 				canActivate: [AdminGuard],
 			},
+			{
+				path: 'errors',
+				component: TestErrorsComponent,
+				canActivate: [AdminGuard],
+			},
 		],
 	},
 	{
 		path: 'register',
 		component: RegisterComponent,
-	},
-	{
-		path: 'errors',
-		component: TestErrorsComponent,
 	},
 	{
 		path: 'not-found',
