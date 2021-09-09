@@ -101,6 +101,11 @@ namespace API
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+			// files to be served
+			// if index.html is found, use it
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
@@ -108,6 +113,9 @@ namespace API
 				// SignalR
 				endpoints.MapHub<PresenceHub>("hubs/presence");
 				endpoints.MapHub<MessageHub>("hubs/message");
+
+				// Fallback controller to handle Angular routing
+				endpoints.MapFallbackToController("Index", "Fallback");
 			});
 		}
 	}

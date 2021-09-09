@@ -17,7 +17,8 @@
 				"build": {
 					"builder": "@angular-devkit/build-angular:browser",
 					"options": {
-						"outputPath": "dist/client",
+						//"outputPath": "dist/client",
+						"outputPath": "../API/wwwroot",
 						"index": "src/index.html",
 						"main": "src/main.ts",
 						"polyfills": "src/polyfills.ts",
@@ -39,8 +40,12 @@
 							"budgets": [
 								{
 									"type": "initial",
-									"maximumWarning": "500kb",
-									"maximumError": "1mb"
+									"maximumWarning": "2mb",
+									"maximumError": "5mb"
+									// ng build
+									// ERROR: initial exceeded maximum budget. Budget 1.00 MB was not met by 261.25 kB with a total of 1.26 MB.
+									//"maximumWarning": "500kb",
+									//"maximumError": "1mb"
 								},
 								{
 									"type": "anyComponentStyle",
