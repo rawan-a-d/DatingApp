@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Group } from '../_models/group';
 import { Message } from '../_models/message';
 import { User } from '../_models/user';
+import { BusyService } from './busy.service';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 @Injectable({
@@ -20,9 +21,12 @@ export class MessageService {
 	private messageThreadSource = new BehaviorSubject<Message[]>([]);
 	messageThread$ = this.messageThreadSource.asObservable();
 
-	constructor(private http: HttpClient) {}
+	constructor(private http: HttpClient, private busyService: BusyService) {}
 
 	createHubConnection(user: User, otherUsername: string) {
+		// loading
+		this.busyService.busy();
+
 		// create connection
 		this.hubConnection = new HubConnectionBuilder()
 			.withUrl(this.hubUrl + 'message?user=' + otherUsername, {
@@ -31,9 +35,14 @@ export class MessageService {
 			.withAutomaticReconnect() // reconnect client when there is a problem
 			.build();
 
-		//******************************* */
 		// start connection
-		this.hubConnection.start().catch((error) => console.log(error));
+		this.hubConnection
+			.start()
+			.catch((error) => console.log(error))
+			.finally(() => {
+				// turn off loading
+				this.busyService.idle();
+			});
 
 		// when a user is connected to hub send messages
 		this.hubConnection.on('ReceiveMessageThread', (messages) => {
@@ -68,6 +77,9 @@ export class MessageService {
 	stopHubConnection() {
 		// if there is a connection
 		if (this.hubConnection) {
+			// clear message thread
+			this.messageThreadSource.next([]);
+
 			this.hubConnection.stop();
 		}
 	}
